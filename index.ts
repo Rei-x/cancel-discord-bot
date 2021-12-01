@@ -1,4 +1,5 @@
 import { Client, Intents } from "discord.js";
+import config from "./config";
 
 const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
 
@@ -12,6 +13,8 @@ client.on("interactionCreate", async (interaction) => {
   if (interaction.commandName === "ping") {
     await interaction.reply("Pong!");
   }
+
+  await interaction.reply("luigi");
 });
 
-client.login("token");
+client.login(config.TOKEN);

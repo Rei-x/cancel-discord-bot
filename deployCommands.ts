@@ -5,8 +5,14 @@ import config from "./config";
 
 const commands = [
   new SlashCommandBuilder()
-    .setName("ping")
-    .setDescription("Replies with pong!"),
+    .setName("cancel")
+    .setDescription("Cancelluje oponenta")
+    .addUserOption((option) =>
+      option
+        .setName("użytkownik")
+        .setDescription("Użytkownik, którego chcesz zcancellować")
+        .setRequired(true)
+    ),
   new SlashCommandBuilder()
     .setName("server")
     .setDescription("Replies with server info!"),
