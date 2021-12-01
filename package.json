@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "ts-node-dev index.ts",
+    "start": "ts-node-dev src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
     "deploy": "ts-node deployCommands.ts"
   },
@@ -36,6 +36,7 @@
     "@discordjs/builders": "^0.8.2",
     "@discordjs/rest": "^0.1.0-canary.0",
     "@prisma/client": "^3.6.0",
+    "canvas": "^2.8.0",
     "discord-api-types": "^0.25.2",
     "discord.js": "^13.3.1",
     "dotenv": "^10.0.0",
