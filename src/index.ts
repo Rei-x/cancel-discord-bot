@@ -1,7 +1,6 @@
-import { Client, Intents, Message, MessageAttachment } from "discord.js";
-import Canvas from "canvas";
+import { Client, Intents, Message } from "discord.js";
 import config from "./config";
-import { drawCircledImage } from "./utils";
+import { createCancelImage } from "./imageFormatting/cancelImage";
 
 const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
 
@@ -16,25 +15,7 @@ client.on("interactionCreate", async (interaction) => {
     const cancelledUser = interaction.options.getUser("użytkownik");
     if (!cancelledUser) return;
 
-    const canvas = Canvas.createCanvas(500, 200);
-    const context = canvas.getContext("2d");
-    const background = await Canvas.loadImage("src/assets/cancel.png");
-    context.drawImage(background, 0, 0, canvas.width, canvas.height);
-    const avatar = await Canvas.loadImage(
-      interaction.user.displayAvatarURL({ format: "jpg" })
-    );
-    drawCircledImage(context, avatar, 25, 25, 150, 150);
-    const cancelledAvatar = await Canvas.loadImage(
-      cancelledUser.displayAvatarURL({ format: "jpg" })
-    );
-    drawCircledImage(context, cancelledAvatar, 300, 25, 150, 150);
-
-    const diamondSword = await Canvas.loadImage("src/assets/diamondsword.png");
-    context.drawImage(diamondSword, 150, 50, 100, 100);
-
-    // Draw a shape onto the main canvas
-
-    const attachment = new MessageAttachment(canvas.toBuffer(), "cancel.png");
+    const attachment = await createCancelImage(interaction.user, cancelledUser);
 
     const message = (await interaction.reply({
       files: [attachment],
