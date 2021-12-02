@@ -6,7 +6,7 @@
   "scripts": {
     "start": "ts-node-dev src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "deploy": "ts-node deployCommands.ts"
+    "deploy": "ts-node src/deployCommands.ts"
   },
   "repository": {
     "type": "git",
@@ -38,6 +38,7 @@
     "@prisma/client": "^3.6.0",
     "canvas": "^2.8.0",
     "discord-api-types": "^0.25.2",
+    "discord-emoji-convert": "^2.1.2",
     "discord.js": "^13.3.1",
     "dotenv": "^10.0.0",
     "prisma": "^3.6.0"

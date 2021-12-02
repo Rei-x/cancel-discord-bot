@@ -13,5 +13,6 @@ module.exports = {
   plugins: ["@typescript-eslint"],
   rules: {
     "no-console": 0,
+    "no-underscore-dangle": 0,
   },
 };

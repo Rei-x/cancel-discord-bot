@@ -14,11 +14,8 @@ const commands = [
         .setRequired(true)
     ),
   new SlashCommandBuilder()
-    .setName("server")
-    .setDescription("Replies with server info!"),
-  new SlashCommandBuilder()
-    .setName("user")
-    .setDescription("Replies with user info!"),
+    .setName("tabela")
+    .setDescription("Pokazuje tabele kto ile razy został zcancellowany"),
 ].map((command) => command.toJSON());
 
 const rest = new REST({ version: "9" }).setToken(config.TOKEN);
