@@ -1,10 +1,22 @@
+import { Collection, User } from "discord.js";
+
 const YES_EMOJI = "✅";
 const NO_EMOJI = "❌";
 
-const countStringsInArray = (string: string, array: string[]) =>
-  array.reduce((previousValue, currentValue) => {
-    if (currentValue === string) return previousValue + 1;
-    return previousValue;
-  }, 0);
+const countEmojis = (
+  emojis: { [x: string]: Collection<string, User> },
+  emoji: string
+) => {
+  if (emoji in emojis) return Array.from(emojis[emoji].values()).length;
+  return 0;
+};
 
-export { YES_EMOJI, NO_EMOJI, countStringsInArray };
+const getUsersIdByEmoji = (
+  emojis: { [x: string]: Collection<string, User> },
+  emoji: string
+) => {
+  if (emoji in emojis) return Array.from(emojis[emoji].keys());
+  return [];
+};
+
+export { YES_EMOJI, NO_EMOJI, countEmojis, getUsersIdByEmoji };

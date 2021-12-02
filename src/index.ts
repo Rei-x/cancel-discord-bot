@@ -1,7 +1,18 @@
-import { Client, Intents, Message } from "discord.js";
+import {
+  Client,
+  Collection,
+  CollectorFilter,
+  Intents,
+  Message,
+  MessageReaction,
+  User,
+} from "discord.js";
+import { PrismaClient } from "@prisma/client";
 import config from "./config";
-import { countStringsInArray, NO_EMOJI, YES_EMOJI } from "./emojis";
+import { countEmojis, getUsersIdByEmoji, NO_EMOJI, YES_EMOJI } from "./emojis";
 import { createCancelImage } from "./imageFormatting/cancelImage";
+
+const prisma = new PrismaClient();
 
 const client = new Client({
   intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGE_REACTIONS],
@@ -33,31 +44,62 @@ client.on("interactionCreate", async (interaction) => {
     await message.react("❌");
 
     let seconds = 15;
-    let emojis: string[];
+    let emojis: { [x: string]: Collection<string, User> };
     const interval = setInterval(async () => {
       seconds -= 1;
       await message.edit(`${baseMessage}\nZostało ${seconds} sekund`);
       if (seconds === 0) {
         clearInterval(interval);
 
-        const yesCount = countStringsInArray(YES_EMOJI, emojis);
-        const noCount = countStringsInArray(NO_EMOJI, emojis);
-
-        await message.reply(
-          `<@${interaction.user.id}> zcancellował <@${cancelledUser.id}>
-          \n${YES_EMOJI}: ${yesCount}
-          \n${NO_EMOJI}: ${noCount}`
-        );
+        const yesCount = countEmojis(emojis, YES_EMOJI);
+        const noCount = countEmojis(emojis, NO_EMOJI);
+        console.log(yesCount);
+        const isCancelled = yesCount > noCount;
+        if (isCancelled) {
+          await message.reply(
+            `<@${interaction.user.id}> zcancellował <@${cancelledUser.id}>
+            \n${YES_EMOJI}: ${yesCount}  ${NO_EMOJI}: ${noCount}`
+          );
+        } else {
+          await message.reply(
+            `<@${interaction.user.id}> nie udało się zcancellować <@${cancelledUser.id}>
+            \n${YES_EMOJI}: ${yesCount}  ${NO_EMOJI}: ${noCount}`
+          );
+        }
+        await prisma.cancels.create({
+          data: {
+            guildId: interaction.guildId,
+            cancelledUserId: cancelledUser.id,
+            whoStartedId: interaction.user.id,
+            whoVotedForYes: getUsersIdByEmoji(emojis, YES_EMOJI),
+            whoVotedForNo: getUsersIdByEmoji(emojis, NO_EMOJI),
+            cancelled: isCancelled,
+          },
+        });
       }
     }, 1000);
-    const collector = message.createReactionCollector({ time: seconds * 1000 });
-    collector.on("collect", (r) => {
-      console.log(`Collected ${r.emoji.name}`);
+
+    const filter: CollectorFilter<[MessageReaction, User]> = (reaction, user) =>
+      [YES_EMOJI, NO_EMOJI].includes(reaction.emoji.name || "") && !user.bot;
+
+    const collector = message.createReactionCollector({
+      filter,
+      time: seconds * 1000,
     });
-    collector.on("end", (collected) => {
+
+    collector.on("collect", (r) => {
+      console.log(`Collected ${r.emoji}`);
+    });
+    collector.on("end", async (collected) => {
       console.log(`Collected ${collected.size} items`);
-      console.log();
-      emojis = collected.map((reaction) => reaction.emoji.name || "");
+
+      emojis = await collected.reduce(async (acc, reaction) => {
+        const awaitedAcc = await acc;
+        awaitedAcc[reaction.emoji.name || "unnamed"] = (
+          await reaction.users.fetch()
+        ).filter((user) => !user.bot);
+        return awaitedAcc;
+      }, Promise.resolve({}) as Promise<Record<string, Collection<string, User>>>);
     });
   }
 });

@@ -14,9 +14,10 @@ datasource db {
 model Cancels {
   id              Int      @id @default(autoincrement())
   timestamp       DateTime @default(now())
-  guildId         Int
-  cancelledUserId Int
-  whoStartedId    Int
-  whoVotedForYes  Int[]
-  whoVotedForNo   Int[]
+  guildId         String
+  cancelledUserId String
+  whoStartedId    String
+  whoVotedForYes  String[]
+  whoVotedForNo   String[]
+  cancelled       Boolean  @default(false)
 }
