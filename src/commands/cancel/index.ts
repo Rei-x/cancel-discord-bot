@@ -27,8 +27,8 @@ export default async (interaction: CommandInteraction<CacheType>) => {
     fetchReply: true,
   })) as Message<true>;
 
-  await message.react("✅");
-  await message.react("❌");
+  await message.react(YES_EMOJI);
+  await message.react(NO_EMOJI);
 
   const seconds = 60;
 
