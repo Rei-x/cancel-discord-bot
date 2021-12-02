@@ -1,8 +1,4 @@
-import {
-  CommandInteraction,
-  CacheType,
-  Message,
-} from "discord.js";
+import { CommandInteraction, CacheType, Message } from "discord.js";
 import { PrismaClient } from "@prisma/client";
 import {
   countEmojis,
@@ -34,11 +30,12 @@ export default async (interaction: CommandInteraction<CacheType>) => {
   await message.react("✅");
   await message.react("❌");
 
-  const seconds = 15;
+  const seconds = 60;
 
-  showCountdown({ message, seconds, baseMessage });
+  const interval = showCountdown({ message, seconds, baseMessage });
 
   const emojis = await getEmojis(message, seconds);
+  clearInterval(interval);
 
   const yesCount = countEmojis(emojis, YES_EMOJI);
   const noCount = countEmojis(emojis, NO_EMOJI);
