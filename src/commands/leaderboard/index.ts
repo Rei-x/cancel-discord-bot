@@ -9,6 +9,7 @@ export default async (interaction: CommandInteraction<CacheType>) => {
     by: ["cancelledUserId"],
     where: {
       guildId: interaction.guildId,
+      cancelled: true,
     },
     _count: true,
     orderBy: {
